@@ -77,3 +77,44 @@ lux -p https://www.bilibili.com/video/BV1GJ411x7
 3. 端口转发：Lux 是命令行工具，不需要端口转发。但如果需要开发 Web 界面，可以在 devcontainer.json 中配置 "forwardPorts"。
 4. 持久化代码：记得将你的代码提交并推送到 GitHub，否则 Codespace 停止后更改会丢失。
 建议使用方法一的 devcontainer.json 方式，这样每次创建 Codespace 时环境都会自动配置好，无需手动操作。
+
+
+
+从错误信息来看，问题出在 lux 工具无法从 YouTube 页面提取视频下载所需的 basejs URL。以下是具体原因和解决方案：
+---
+错误原因分析
+1. YouTube 页面结构变化
+  • lux 依赖解析 YouTube 页面的 playerConfig（播放器配置）来获取视频流地址。
+  • 错误信息 unable to find basejs URL in playerConfig 表明：
+    • YouTube 更新了页面结构或加密逻辑，lux 当前版本（v0.24.1）无法正确解析新的 playerConfig。
+    • 可能是 YouTube 加强了反爬机制，导致第三方工具无法获取关键数据。
+2. lux 版本过旧
+  • 你使用的 lux 版本是 v0.24.1（较旧），而 YouTube 频繁更新，旧版本可能已失效。
+3. 网络或地区限制
+  • 某些地区可能被 YouTube 限制访问，或网络代理/防火墙干扰了请求。
+---
+解决方案
+✅ 1. 升级 lux 到最新版本
+# 卸载旧版本
+go clean -i github.com/iawia002/lux
+
+# 安装最新版（需 Go 1.16+）
+go install github.com/iawia002/lux@latest
+• 检查是否成功：lux --version
+• 如果仍报错，尝试从源码编译最新版：
+git clone https://github.com/iawia002/lux.git
+cd lux
+go build -o lux
+./lux https://www.youtube.com/c/Vox
+✅ 2. 
+✅ 3. 使用替代工具
+如果 lux 仍无法工作，尝试其他支持 YouTube 的下载工具：
+# yt-dlp（推荐，持续更新）
+pip install -U yt-dlp
+yt-dlp https://www.youtube.com/c/Vox
+
+# youtube-dl（较旧，但稳定）
+pip install youtube-dl
+youtube-dl https://www.youtube.com/c/Vox
+
+
